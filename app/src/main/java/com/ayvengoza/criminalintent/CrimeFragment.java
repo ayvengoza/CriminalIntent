@@ -1,5 +1,7 @@
 package com.ayvengoza.criminalintent;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,6 +25,7 @@ import static android.widget.CompoundButton.*;
 
 public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
+    private static final String RESPONSE_CRIME_ID = "response_crime_id";
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -38,11 +41,20 @@ public class CrimeFragment extends Fragment {
         return fragment;
     }
 
+    public static UUID getResporseUUID(Intent intent){
+        UUID crimeId = (UUID) intent.getSerializableExtra(RESPONSE_CRIME_ID);
+        return crimeId;
+    }
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
+        Intent intent = new Intent();
+        intent.putExtra(RESPONSE_CRIME_ID, crimeId);
+        getActivity().setResult(Activity.RESULT_OK, intent);
     }
 
     @Nullable
