@@ -9,6 +9,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +31,8 @@ public class CrimePagerActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
     private List<Crime> mCrimes;
+    private Button mStartPageButton;
+    private Button mEndPageButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,11 +59,58 @@ public class CrimePagerActivity extends AppCompatActivity {
             }
         });
 
+        mStartPageButton = (Button) findViewById(R.id.start_page_button);
+        mEndPageButton = (Button) findViewById(R.id.end_page_button);
+
+        mStartPageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewPager.setCurrentItem(0);
+            }
+        });
+        mEndPageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewPager.setCurrentItem(mCrimes.size() > 0 ? mCrimes.size()-1 : 0);
+            }
+        });
+
         for(int i=0; i<mCrimes.size(); i++){
             if(mCrimes.get(i).getId().equals(crimeId)){
+                setButtonState(i);
                 mViewPager.setCurrentItem(i);
                 break;
             }
+        }
+
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                setButtonState(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
+    private void setButtonState(int position){
+        if(position == 0){
+            mStartPageButton.setVisibility(View.INVISIBLE);
+        } else {
+            mStartPageButton.setVisibility(View.VISIBLE);
+        }
+        if(position == mCrimes.size()-1){
+            mEndPageButton.setVisibility(View.GONE);
+        } else {
+            mEndPageButton.setVisibility(View.VISIBLE);
         }
     }
 }
