@@ -40,17 +40,6 @@ public class CrimeListFragment extends Fragment {
         updateUI();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_CRIME){
-            UUID crimeId = CrimeActivity.getResponseUUID(data);
-            Crime crime = CrimeLab.get(getActivity()).getCrime(crimeId);
-            int position = CrimeLab.get(getActivity()).getCrimes().indexOf(crime);
-            mAdapter.notifyItemChanged(position);
-        }
-    }
-
     private void updateUI(){
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
@@ -58,7 +47,7 @@ public class CrimeListFragment extends Fragment {
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mAdapter);
         } else {
-            //mAdapter.notifyDataSetChanged();
+            mAdapter.notifyDataSetChanged();
         }
     }
 
@@ -72,8 +61,8 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
-            startActivityForResult(intent,REQUEST_CRIME);
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
+            startActivity(intent);
         }
     }
 

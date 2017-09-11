@@ -25,8 +25,6 @@ import static android.widget.CompoundButton.*;
 
 public class CrimeFragment extends Fragment {
     private static final String ARG_CRIME_ID = "crime_id";
-    public static final String RESPONSE_CRIME_ID = "response_crime_id";
-
     private Crime mCrime;
     private EditText mTitleField;
     private Button mDateButton;
@@ -46,9 +44,6 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
-        Intent intent = new Intent();
-        intent.putExtra(RESPONSE_CRIME_ID, crimeId);
-        getActivity().setResult(Activity.RESULT_OK, intent);
     }
 
     @Nullable
