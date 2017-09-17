@@ -30,6 +30,13 @@ public class CrimeLab {
         mCrimes.add(c);
     }
 
+    public void delete(UUID id) {
+        Crime crime = getCrime(id);
+        int index = mCrimes.indexOf(crime);
+        if(index >= 0)
+            mCrimes.remove(index);
+    }
+
     public List<Crime> getCrimes() {
         return mCrimes;
     }
