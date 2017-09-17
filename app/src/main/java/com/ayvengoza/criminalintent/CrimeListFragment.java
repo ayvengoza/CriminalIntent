@@ -25,13 +25,18 @@ import java.util.UUID;
 
 public class CrimeListFragment extends Fragment {
     private static final int REQUEST_CRIME = 1;
+    private static final String SAVED_SUBTITLE_VISIBLE = "subtitle_visible";
 
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
+    private boolean mSubtitleVisible;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState != null) {
+            mSubtitleVisible = savedInstanceState.getBoolean(SAVED_SUBTITLE_VISIBLE, false);
+        }
         setHasOptionsMenu(true);
     }
 
@@ -52,9 +57,21 @@ public class CrimeListFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVED_SUBTITLE_VISIBLE, mSubtitleVisible);
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_crime_list, menu);
+        MenuItem subtitleView = menu.findItem(R.id.show_subtitle);
+        if(mSubtitleVisible){
+            subtitleView.setTitle(R.string.hide_subtitle);
+        } else {
+            subtitleView.setTitle(R.string.show_subtitle);
+        }
     }
 
     @Override
@@ -67,6 +84,8 @@ public class CrimeListFragment extends Fragment {
                 startActivity(intent);
                 return true;
             case R.id.show_subtitle:
+                mSubtitleVisible = !mSubtitleVisible;
+                getActivity().invalidateOptionsMenu();
                 updateSubtitle();
                 return true;
             default:
@@ -77,6 +96,9 @@ public class CrimeListFragment extends Fragment {
     private void updateSubtitle(){
         int crimeCount = CrimeLab.get(getActivity()).getCrimes().size();
         String subtitle = getString(R.string.subtitle_format, crimeCount);
+        if(!mSubtitleVisible){
+            subtitle = null;
+        }
         AppCompatActivity appCompatActivity = (AppCompatActivity)getActivity();
         appCompatActivity.getSupportActionBar().setSubtitle(subtitle);
     }
@@ -90,6 +112,7 @@ public class CrimeListFragment extends Fragment {
         } else {
             mAdapter.notifyDataSetChanged();
         }
+        updateSubtitle();
     }
 
     private abstract class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
