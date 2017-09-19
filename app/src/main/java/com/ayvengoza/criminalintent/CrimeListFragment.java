@@ -21,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
-import java.util.UUID;
 
 
 public class CrimeListFragment extends Fragment {
@@ -85,7 +84,7 @@ public class CrimeListFragment extends Fragment {
         switch (item.getItemId()){
             case R.id.new_crime:
                 Crime crime = new Crime();
-                CrimeLab.get(getActivity()).add(crime);
+                CrimeLab.get(getActivity()).addCrime(crime);
                 Intent intent = CrimePagerActivity.newIntent(getActivity(),crime.getId());
                 startActivity(intent);
                 return true;
@@ -121,6 +120,7 @@ public class CrimeListFragment extends Fragment {
             mAdapter = new CrimeAdapter(crimes);
             mCrimeRecyclerView.setAdapter(mAdapter);
         } else {
+            mAdapter.setCrimes(crimes);
             mAdapter.notifyDataSetChanged();
         }
         updateSubtitle();
@@ -232,5 +232,8 @@ public class CrimeListFragment extends Fragment {
             }
         }
 
+        public void setCrimes(List<Crime> crimes) {
+            mCrimes = crimes;
+        }
     }
 }
