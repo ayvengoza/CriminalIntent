@@ -44,7 +44,7 @@ public class CrimeLab {
     }
 
     public void delete(UUID id) {
-
+        deleteCrime(id);
     }
 
     public List<Crime> getCrimes() {
@@ -110,5 +110,13 @@ public class CrimeLab {
                 null,
                 null);
         return new CrimeCursorWraper(cursor);
+    }
+
+    private void deleteCrime(UUID id){
+        mDatabase.delete(
+                CrimeTable.NAME,
+                CrimeTable.Cols.UUID + " = ?",
+                new String[]{id.toString()}
+        );
     }
 }
