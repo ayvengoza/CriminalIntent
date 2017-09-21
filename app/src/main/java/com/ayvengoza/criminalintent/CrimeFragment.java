@@ -1,6 +1,8 @@
 package com.ayvengoza.criminalintent;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -8,8 +10,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.ShareCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -40,6 +45,7 @@ public class CrimeFragment extends Fragment {
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
     private static final int REQUEST_CONTACT = 2;
+    private static final int REQUEST_READ_CONTACTS = 3;
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -47,6 +53,7 @@ public class CrimeFragment extends Fragment {
     private CheckBox mSolvedCheckBox;
     private Button mReportButton;
     private Button mSuspectButton;
+    private Button mSuspectCallButton;
 
     public static CrimeFragment newInstance(UUID crime_id){
         Bundle args = new Bundle();
@@ -109,7 +116,6 @@ public class CrimeFragment extends Fragment {
         });
 
         mDateButton = (Button) v.findViewById(R.id.crime_date);
-        updateDate();
         mDateButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,12 +149,11 @@ public class CrimeFragment extends Fragment {
         mReportButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
-                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject));
-                intent = Intent.createChooser(intent, getString(R.string.send_report));
+                Intent intent = ShareCompat.IntentBuilder.from(getActivity())
+                        .setType("text/plain")
+                        .setText(getCrimeReport())
+                        .setSubject(getString(R.string.crime_report_subject))
+                        .createChooserIntent();
                 startActivity(intent);
                 }
         });
@@ -165,15 +170,31 @@ public class CrimeFragment extends Fragment {
             }
         });
 
-        if(mCrime.getSuspect() != null){
-            mSuspectButton.setText(mCrime.getSuspect());
-        }
 
         PackageManager packageManager = getActivity().getPackageManager();
         if(packageManager.resolveActivity(pickContact,
                 PackageManager.MATCH_DEFAULT_ONLY) == null) {
             mSuspectButton.setEnabled(false);
         }
+
+        mSuspectCallButton = (Button) v.findViewById(R.id.crime_suspect_call);
+        mSuspectCallButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Uri uriTel = findUriTel();
+                if(uriTel != null) {
+                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                    intent.setData(uriTel);
+
+                    startActivity(intent);
+                }
+
+
+            }
+        });
+
+        updateDate();
 
         return v;
     }
@@ -227,7 +248,12 @@ public class CrimeFragment extends Fragment {
 
     private void updateDate() {
         mDateButton.setText(mCrime.getDate().toString());
-        mSuspectButton.setText(mCrime.getSuspect());
+        if(mCrime.getSuspect() != null){
+            mSuspectButton.setText(mCrime.getSuspect());
+            mSuspectCallButton.setVisibility(View.VISIBLE);
+        } else {
+            mSuspectCallButton.setVisibility(View.INVISIBLE);
+        }
     }
 
     private String getCrimeReport(){
@@ -255,5 +281,50 @@ public class CrimeFragment extends Fragment {
                 suspect);
 
         return report;
+    }
+
+    private boolean checkContactsPermission(){
+        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.READ_CONTACTS);
+        if(permissionCheck != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(
+                    getActivity(),
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    REQUEST_READ_CONTACTS);
+            permissionCheck = ContextCompat.checkSelfPermission(getActivity(),
+                    Manifest.permission.READ_CONTACTS);
+        }
+        return permissionCheck == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private Uri findUriTel(){
+        if(checkContactsPermission()) {
+            Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+            ContentResolver contentResolver = getActivity().getContentResolver();
+            String[] projection = new String[]{
+                    ContactsContract.Contacts.DISPLAY_NAME,
+                    ContactsContract.CommonDataKinds.Phone.NUMBER};
+            String selection = ContactsContract.Contacts.DISPLAY_NAME + " = ?";
+            String[] selectionArgs = new String[]{mCrime.getSuspect()};
+
+            Cursor cursor = contentResolver.query(
+                    uri,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null
+            );
+            try {
+                if(cursor.getCount() == 0)
+                    return null;
+                cursor.moveToFirst();
+                int index = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                String number = cursor.getString(index);
+                return Uri.parse("tel:" + number);
+            } finally {
+                cursor.close();
+            }
+        }
+        return null;
     }
 }
