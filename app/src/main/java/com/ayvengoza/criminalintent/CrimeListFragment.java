@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -64,6 +65,24 @@ public class CrimeListFragment extends Fragment {
         mNoCrimeTextView.setGravity(Gravity.CENTER);
         container.addView(mNoCrimeTextView);
         updateUI();
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                if(direction == ItemTouchHelper.LEFT){
+                    int position = viewHolder.getAdapterPosition();
+                    List<Crime> crimes = CrimeLab.get(getActivity()).getCrimes();
+                    CrimeLab.get(getActivity()).delete(crimes.get(position).getId());
+                    mAdapter.notifyItemRemoved(position);
+                    updateUI();
+                }
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(mCrimeRecyclerView);
         return view;
     }
 
@@ -127,8 +146,8 @@ public class CrimeListFragment extends Fragment {
     }
 
     public void updateUI(){
-        CrimeLab crimeLab = CrimeLab.get(getActivity());
-        List<Crime> crimes = crimeLab.getCrimes();
+        final CrimeLab crimeLab = CrimeLab.get(getActivity());
+        final List<Crime> crimes = crimeLab.getCrimes();
         if(crimes.size() == 0){
             mNoCrimeTextView.setVisibility(View.VISIBLE);
         } else {
