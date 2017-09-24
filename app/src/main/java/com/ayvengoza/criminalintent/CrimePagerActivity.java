@@ -20,7 +20,7 @@ import java.util.UUID;
  * Activity for swipe pages
  */
 
-public class CrimePagerActivity extends AppCompatActivity {
+public class CrimePagerActivity extends AppCompatActivity implements CrimeFragment.Callbacks{
     public static final String EXTRA_CRIME_ID =
             "com.ayvengoza.criminalintent.crime_id";
     public static Intent newIntent(Context packageContext, UUID crimeID){
@@ -112,5 +112,10 @@ public class CrimePagerActivity extends AppCompatActivity {
         } else {
             mEndPageButton.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onCrimeUpdated() {
+
     }
 }
