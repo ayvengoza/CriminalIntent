@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="crime_title_hint">
+        Введіт розгорнутий заголовок для злочину.
+    </string>
+</resources>

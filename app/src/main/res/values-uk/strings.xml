@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CriminalIntent</string>
+    <string name="crime_title_hint">Введіть заголовок злочину.</string>
+    <string name="crime_title_label">Заголовок</string>
+    <string name="crime_details_label">Опис</string>
+    <string name="crime_solved_label">Вирішено</string>
+    <string name="date_picker_title">Дата злочину:</string>
+    <string name="time_picker_title">Час злочину</string>
+    <string name="new_crime">Новий злочин</string>
+    <string name="show_subtitle">Показати титр</string>
+    <string name="hide_subtitle">Сховати титр</string>
+    <string name="subtitle_format">%1$d злочинів</string>
+    <plurals name="subtitle_plural">
+        <item quantity="one">%1$d злочин</item>
+        <item quantity="few">%1$d злочини</item>
+        <item quantity="many">%1$d злочинів</item>
+    </plurals>
+    <string name="menu_delete_crime">Видалити злочин</string>
+    <string name="no_crimes">Немає злочинів</string>
+    <string name="crime_suspect_text">Вибрати підозрюваного</string>
+    <string name="crime_report_text">Відправити репорт</string>
+    <string name="crime_report">%1$s!
+    The crime was discovered on %2$s. %3$s, and %4$s
+    </string>
+    <string name="crime_report_solved">Проблема вирішена</string>
+    <string name="crime_report_unsolved">Проблема не вирішена</string>
+    <string name="crime_report_no_suspect">підозрюваних немає.</string>
+    <string name="crime_report_suspect">підозрюється %s.</string>
+    <string name="send_report">Надіслати звіт через</string>
+    <string name="crime_suspect_call">Телефонувати підозрюваному</string>
+    <string name="crime_report_subject">CriminalIntent Звіт</string>
+</resources>
