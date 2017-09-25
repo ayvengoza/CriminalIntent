@@ -38,6 +38,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -328,7 +330,12 @@ public class CrimeFragment extends Fragment {
     }
 
     private void updateDate() {
-        mDateButton.setText(mCrime.getDate().toString());
+        Format format = DateFormat.getDateFormat(getActivity());
+        String datePattern = ((SimpleDateFormat)format).toLocalizedPattern();
+        String timePattern = "HH:mm:ss";
+        String separator = " ";
+        String dateFormate = DateFormat.format(datePattern + separator +timePattern, mCrime.getDate()).toString();
+        mDateButton.setText(dateFormate);
         if(mCrime.getSuspect() != null){
             mSuspectButton.setText(mCrime.getSuspect());
             mSuspectCallButton.setVisibility(View.VISIBLE);
